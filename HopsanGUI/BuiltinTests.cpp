@@ -1,6 +1,10 @@
 #include "BuiltinTests.h"
 
+#include "HcomTest.hpp"
+
 int runBuiltInTests() {
 
-    return 0;
+    HComTest hcomtest{};
+    int rc = QTest::qExec(&hcomtest);
+    return rc;
 }
