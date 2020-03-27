@@ -127,6 +127,9 @@ Arguments:
             runApplication = false;
         }
         else if (arg == "--test") {
+
+
+            initAppForTest();
             applicationReturnCode = runBuiltInTests();
             runApplication = false;
         }

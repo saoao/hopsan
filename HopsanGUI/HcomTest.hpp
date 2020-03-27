@@ -1,5 +1,8 @@
 #include "HcomHandler.h"
 #include "Widgets/HcomWidget.h"
+#include "ModelHandler.h"
+
+#include "global.h"
 
 #include <QtTest>
 
@@ -9,10 +12,20 @@ class HComTest: public QObject
 private:
     HcomHandler* mpHcom;
 
+    void createTestModel() {
+        QString script = R"(
+                         )";
+        mpHcom->executeCommand("crmo");
+        mpHcom->executeCommand("adco SignalStep step -a 100 100 0");
+        mpHcom->executeCommand("adpa syspar 42");
+        mpHcom->executeCommand("chpa step.t_step.y syspar");
+    }
+
 private slots:
     void initTestCase()
     {
         mpHcom = new HcomHandler(new TerminalConsole(nullptr));
+        connect(gpModelHandler, SIGNAL(modelChanged(ModelWidget*)), mpHcom, SLOT(setModelPtr(ModelWidget*)));
     }
 
     void testScalarMath() {  
@@ -39,6 +52,14 @@ private slots:
         QTest::newRow("6") << "1*2*3" << true << 6.0;
         QTest::newRow("7") << "2*2/3" << true << 4.0/3.0;
         QTest::newRow("8") << "2+2/3" << true << 2+(2.0/3.0);
+    }
+
+    void testParameterCommands() {
+        createTestModel();
+        mpHcom->evaluateExpression("syspar");
+        QCOMPARE(mpHcom->mAnsType, HcomHandler::Scalar);
+        QCOMPARE(mpHcom->mAnsScalar, 42);
+
     }
 
 
